@@ -1,0 +1,1153 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[portuguese]{babel}
+\usepackage{indentfirst}
+\usepackage[pdfborder={0 0 0}]{hyperref}
+\usepackage{a4wide}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{relsize}
+\usepackage{listings}
+\usepackage{chngcntr}
+\usepackage{nomencl}
+
+\lstset{
+    basicstyle=\small,
+    breaklines=true,
+    frame=tb, 
+    mathescape=true,
+    showstringspaces=false,
+    captionpos=b,
+    keepspaces=true,
+    escapeinside=``,
+    language=Prolog
+}
+
+\title{Sistemas de Representação de \\ Conhecimento e Raciocínio\\ [0.8em] 
+\smaller{}Programação em Lógica Estendida e Conhecimento Imperfeito}
+\author{André Ferreira (a64296) \and Maria João Moreira (a89540) \and Rúben Rodrigues (a80960) 
+\and Rui Fernandes (a89138)
+\and Rui Morais (a76650)}
+\date{Maio 2021}
+
+\renewcommand\labelitemi{---}
+\renewcommand{\nomname}{Lista de Siglas e Acrónimos}
+\counterwithin{figure}{section}
+
+\makenomenclature
+
+\begin{document}
+
+\begin{titlepage}
+    \begin{center}
+        \begin{minipage}{0.75\linewidth}
+            \centering
+            \includegraphics[width=0.4\textwidth]{img/EEUM.png}\par\vspace{1cm}
+            \vspace{1.5cm}
+            \href{https://www.uminho.pt/PT}{\scshape\LARGE Universidade do Minho} \par
+            \vspace{1cm}
+            \href{https://www.di.uminho.pt/}{\scshape\Large Departamento de Informática} \par
+            \vspace{1.5cm}
+            \maketitle
+        \end{minipage}
+    \end{center}
+    \vspace{2cm}
+    \thispagestyle{empty}
+    \clearpage
+\end{titlepage}
+
+\pagenumbering{roman}
+
+\begin{abstract}
+
+O presente relatório tem como objetivo descrever a solução criada pelo grupo para a 
+problemática proposta pelos docentes
+da Unidade Curricular de 
+\href{https://miei.di.uminho.pt/plano_estudos.html#sistemas_de_representa_o_de_conhecimento_e_racioc
+_nio}
+{\emph{Sistemas de Representação de Conhecimento e Raciocínio}}, ao longo do segundo semestre do 
+terceiro ano do
+\href{http://miei.di.uminho.pt}{Mestrado Integrado em Engenharia Informática} da 
+\href{https://www.uminho.pt}{Universidade
+do Minho}.
+
+O presente trabalho tem como principal objetivo aprimorar a utilização da extensão à
+programação em lógica, bem como a representação de conhecimento imperfeito. Assim, pretende-se 
+desenvolver um sistema de representação de conhecimento e raciocínio
+com capacidade para caracterizar um universo de discurso na área da vacinação global da 
+população portuguesa no contexto
+da pandemia COVID-19 que estamos a viver.
+
+Por fim, é apresentada uma reflexão crítica sobre o trabalho desenvolvido, bem como os 
+resultados obtidos.
+\end{abstract}
+
+\pagebreak
+
+\tableofcontents
+
+\pagebreak
+
+\lstlistoflistings
+
+\listoftables
+
+\pagebreak
+
+\pagenumbering{arabic}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\rfoot{Página \thepage \hspace{1pt} de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0pt}
+
+\section{Introdução}
+
+O presente relatório documenta a segunda fase do trabalho prático da Unidade Curricular de 
+\href{https://miei.di.uminho.pt/plano_estudos.html#sistemas_de_representa_o_de_conhecimento_e_racioc
+_nio}
+{\emph{Sistemas de Representação de Conhecimento e Raciocínio}}. Este projeto tem como 
+finalidade o desenvolvimento de um sistema de representação de conhecimento
+e raciocínio com capacidade para caracterizar um universo de discurso na área da 
+vacinação global da população portuguesa no contexto
+da pandemia COVID-19 que estamos a viver.
+
+Inicialmente, começou-se por representar conhecimento positivo e negativo, devido à
+possibilidade de se ter respostas verdadeiras, falsas e desconhecidas, sendo que o
+conhecimento positivo já tinha sido abordado na primeira fase do trabalho prático.
+De seguida, implementou-se a noção de conhecimento imperfeito, devido à presença
+da resposta como o desconhecido, existindo três tipos diferentes deste tipo de conhecimento
+incerto, impreciso e interdito. 
+
+Para a representação de conhecimento imperfeito foi necessário criar predicados correspondentes 
+aos três tipos de conhecimento imperfeito -- incerto, impreciso e interdito. 
+
+Neste documento, serão abordados os novos predicados criados, assim como as
+alterações feitas nos que transitaram da primeira fase do trabalho prático, terminando com uma 
+análise crítica dos resultados do trabalho efetuado.
+
+\pagebreak
+
+\section{Preliminares}
+
+Na primeira fase do trabalho prático realizado anteriormente, foi desenvolvido um sistema de 
+representação de conhecimento e raciocínio capaz de representar conhecimento perfeito, 
+assemelhando-se a um sistema de bases de dados, na
+medida em que assumia-se que a informação representada seria única e válida e que as
+entidades representadas seriam as únicas existentes no mundo exterior.
+
+Após um estudo mais aprofundado em relação à programação em lógica e à respetiva 
+representação de informação, fomos confrontados com algumas limitações. Para debater essas 
+limitações, importa ter em
+atenção que este paradigma se baseia nos seguintes pressupostos:
+
+\begin{itemize}
+    \item \textbf{Pressuposto do Mundo Fechado}, que afirma que toda a informação que não é 
+mencionada na base de conhecimento é considerada como falsa;
+    \item \textbf{Pressuposto dos Nomes Únicos}, que garante que duas constantes diferentes (que 
+definem valores atómicos ou objetos) designam duas entidades diferentes do universo de discurso;
+    \item \textbf{Pressuposto do Domínio Fechado}, que indica que não existem mais objetos no 
+universo de discurso para além daqueles designados por constantes na base de conhecimento.
+\end{itemize}
+
+Estes pressupostos foram salvaguardados na primeira fase do trabalho prático, mas aplicando-os
+no contexto do mundo real podem trazer vários problemas. Por exemplo, num problema
+simples do dia a dia como a intenção de atravessar uma estrada, é necessário ter em atenção
+se está algum carro a aproximar-se. Para tal, recorrendo à programação em lógica, caso na
+base de conhecimento não exista informação relativa a carros a aproximarem-se, o
+motor de inferência indicará que não se aproxima nenhum automóvel e que,
+consequentemente, é seguro atravessar. Porém, isto não prova que não se aproxima
+nenhum carro, apenas que não há nenhuma prova de que se aproximam carros.
+
+Desta forma, surge a necessidade de abolir alguns desses pressupostos visto que nem sempre
+se pretende assumir que a informação representada é a única que é válida e, muito menos,
+que as entidades representadas sejam as únicas existentes no mundo exterior.
+Assim sendo, o Pressuposto dos Nomes Únicos continuará a ser válido uma vez que não interfere 
+negativamente na representação do conhecimento. No entanto, o Pressuposto do Mundo Fechado e o 
+Pressuposto do Domínio Fechado serão substituídos por:
+
+\begin{itemize}
+    \item \textbf{Pressuposto do Mundo Aberto}, que indica que podem existir outros factos ou 
+conclusões verdadeiras para além daqueles representados na base de conhecimento;
+    \item \textbf{Pressuposto do Domínio Aberto}, que garante que podem existir mais objetos do 
+universo de discurso para além daqueles designados pelas constantes da base de conhecimento.
+\end{itemize}
+
+Para além dos novos pressupostos mencionados, a Programação em Lógica
+Estendida permite também representar informação incompleta. Assim,
+existem agora três diferentes tipos de conclusões para uma dada questão: \textit{verdadeira},
+quando existe uma prova explícita de que se trata de conhecimento verdadeiro, \textit{falsa},
+quando existe uma prova explícita de que se trata de conhecimento falso e \textit{desconhecido},
+quando não existe informação que permita inferir uma ou outra das conclusões anteriores.
+
+Por outro lado, o objetivo de estender a
+Programação em Lógica é também passar a ser permitido representar informação negativa
+explicitamente -- \textit{negação forte}. Desta forma, a extensão de um programa em lógica passa
+agora a contar com dois tipos de negação -- a \textit{negação por falha na prova}, que é 
+representada pelo
+termo \texttt{nao}, que nos indica que não existe uma prova na base de conhecimento que
+responda à questão e a \textit{negação forte}, que é uma forma de identificar informação 
+negativa
+ou falsa, representada pela conectiva \texttt{-}, que indica que existe uma prova na base de
+conhecimento de que a questão é falsa.
+
+\subsection{Representação de Conhecimento Imperfeito}
+
+O conhecimento imperfeito consiste na ausência de informação em relação a uma questão 
+colocada. Em caso de informação incompleta, isto é, desconhecida, existem três casos distintos:
+
+\begin{itemize}
+    \item \textbf{Incerto} -- representa valores nulos que não pertencem a nenhum
+    conjunto determinado de valores, sendo portanto completamente desconhecidos;
+    \item \textbf{Impreciso} -- representa valores nulos que pertencem a um conjunto
+    determinado de valores (conhecimento desconhecido mas dentro de um conjunto finito de 
+hipóteses), \textit{i.e} existe uma noção do que é falso mas não
+    se conhece qual a verdadeira resposta;
+    \item \textbf{Interdito} -- representa valores nulos desconhecidos e que não serão permitidos 
+conhecer.
+\end{itemize}
+
+Em suma, considerando o trabalho desenvovlido na fase anterior, para a elaboração do presente 
+trabalho prático resta agora desenvolver um
+sistema de inferência que permita implementar os
+mecanismos de raciocínio mencionados, inerentes a estes sistemas, assim como povoar a base de 
+conhecimento com os diferentes tipo de conhecimento supramencionados.
+
+\pagebreak
+
+\section{Descrição do Trabalho e Análise de Resultados}
+
+Nesta secção irá ser discutida e devidamente fundamentada toda a resolução desta segunda fase 
+do trabalho prático. O foco estará em respeitar as necessidades das várias funcionalidades 
+enumeradas no enunciado do trabalho prático, no sentido de se conseguir produzir uma resolução 
+atenta, mas
+concisa e aceitável.
+
+\subsection{Base de Conhecimento}
+
+Tendo em conta que o universo que se pretende representar continua a focar-se na vacinação global 
+da população portuguesa no contexto da pandemia COVID-19, a base de conhecimento que foi 
+desenvolvida
+na primeira fase do trabalho prático acaba por se manter
+praticamente igual, existindo apenas mínimas alterações.
+
+Com o intuito de representar informação incompleta, torna-se necessário alterar o domínio de 
+soluções passando a incluir o valor de verdade \textit{Desconhecido}. Este
+representa um valor que não pode ser definido de imediato e é com ele que surge o
+conceito de programação em lógica estendida.
+
+Com esta alteração, a definição da base de conhecimento passa a ser a seguinte:
+
+\begin{itemize}
+    \item \texttt{utente: \#Idutente, No Seguranca\_Social, Nome, Data\_Nasc, Email, Telefone,} 
+\texttt{Morada, Profissao,
+    [Doencas\_Cronicas], \#CentroSaude -> \{V, F, D\}} -- Um uten-te tem associado a si um ID,
+    número de Segurança Social, nome, data de nascimento, \textit{email}, telefone, morada, 
+profissão, eventuais doenças
+    crónicas, assim como o ID do centro de saúde que frequenta;
+    \item \texttt{staff: \#Idstaff, \#Idcentro, Nome, Email -> \{V, F, D\}} -- Um elemento do 
+\textit{staff} do centro de saúde
+    é caracterizado pelo seu ID, pelo ID do centro de saúde em que exerce funções, e pelo seu 
+nome e \textit{email};
+    \item \texttt{centro\_saude: \#Idcentro, Nome, Morada, Telefone, Email -> \{V, F, D\}} -- \\Um 
+centro de saúde é identificado
+    pelo seu ID, nome, morada, telefone e \textit{email};
+    \item \texttt{vacinacao\_Covid: \#Idstaff, \#Idutente, Data, Vacina, Toma -> \{V, F, D\}} -- 
+\\O registo de um ato de
+    vacinação é caracterizado pelo ID do elemento do \textit{staff} responsável pela 
+administração da vacina, o ID do utente,
+    a data em que e qual a vacina que a vacina foi administrada, assim como a respetiva toma.
+    \item \texttt{medico: \#Idmedico, \#Idcentro, Nome, Email, Especialidade -> \{V, F, D\}} -- 
+\\Um médico 
+    possui também um ID, nome, \textit{email} e especialidade. Adicionalmente, existe uma 
+associação entre o
+    médico e o centro de saúde em que este exerce funções;
+    \item \texttt{consulta: \#Idmedico, \#Idutente, \#Idcentro, Data -> \{V, F, D\}} -- Uma 
+consulta é caracterizada pelo ID
+    do médico, pelo ID do utente, o centro de saúde é realizada e a respetiva data;
+    \item \texttt{tratamento: \#IdStaff, \#Idutente, \#Idcentro, Data, Descricao -> \{V, F, D\}} -- 
+Um tratamento é caracterizado
+    por uma uma breve descrição, o centro de saúde onde é realizado, assim como o elemento do 
+\textit{staff} que responsável,
+    o utente, e a data em que este foi prestado.
+\end{itemize}
+
+Como forma de construir uma base de conhecimento ampla e generalizada,
+optamos por incluir informação negativa explicitamente, bem como explicitar diretamente o
+Pressuposto do Mundo Fechado para alguns predicados. Desta forma, mantivemos este pressuposto
+para os predicados \texttt{utente}, \texttt{staff} e \texttt{medico}, assumindo então que um 
+utente, um elemento do \textit{staff} do centro de saúde 
+um médico não definidos na base de conhecimento nem que contenham alguma exceção
+associada são considerados conhecimento falso. Esta decisão traz bastante vantagens, como
+por exemplo, no caso da representação de conhecimento imperfeito impreciso, visto que se
+não se soube exatamente o valor da idade do utente mas se souber o intervalo de
+valores em que esta se situa, é possível afirmar com certezas que o utente com a idade não 
+contida entre esses valores é falso, apesar dessa informação não se encontrar
+explicitamente na base de conhecimento.
+
+
+\
+
+\begin{lstlisting}[caption={Pressuposto do Mundo Fechado para os predicados \texttt{utente}, 
+\texttt{centro\_saude} e \texttt{staff}}]
+% Pressuposto do mundo fechado para o predicado utente
+-utente(ID, NUM, NOME, DN, EMAIL, TLF, M, P, DC, CS) :-
+    nao(utente(ID, NUM, NOME, DN, EMAIL, TLF, M, P, DC, CS)),
+    nao(excecao(utente(ID, NUM, NOME, DN, EMAIL, TLF, M, P, DC, CS))).
+
+% Pressuposto do mundo fechado para o predicado centro_saude
+-centro_saude(ID, NOME, M, TLF, EMAIL) :-
+    nao(centro_saude(ID, NOME, M, TLF, EMAIL)),
+    nao(excecao(centro_saude(ID, NOME, M, TLF, EMAIL))).
+
+% Pressuposto do mundo fechado para o predicado staff
+-staff(IDS, IDCENTRO, NOME, EMAIL) :-
+    nao(staff(IDS, IDCENTRO, NOME, EMAIL)),
+    nao(excecao(staff(IDS, IDCENTRO, NOME, EMAIL))).
+\end{lstlisting}
+
+
+\pagebreak
+
+\subsection{Representação de Conhecimento Perfeito}
+
+A representação de conhecimento positivo já se encontra realizada na primeira fase do trabalho 
+prático. No
+entanto, para a realização desta segunda fase foi necessário acrescentar a
+representação do conhecimento negativo.
+
+\subsubsection{Conhecimento Perfeito Positivo}
+
+Tendo o panorama de conhecimento bem definido, começou-se por povoar o sistema acrescentando 
+factos perfeitos positivos relativos a todos os predicados mencionados anteriormente. O povoamento 
+da base de conhecimento com conhecimento perfeito positivo encontra-se em anexo, na secção 
+\ref{sec:perfeito_positivo}
+
+\subsubsection{Conhecimento Perfeito Negativo}
+
+O conhecimento perfeito negativo foi representado tendo em
+conta os diferentes tipos.
+
+\paragraph{Negação por Falha na Prova} -- Quando não existe nenhuma prova aquando da negação 
+do predicado. Esta negação é representada pelo meta-predicado \texttt{nao}, que se
+encontra definido em anexo (secção \ref{sec:aux}).
+
+\paragraph{Negação Forte} -- Quando se afirma que um determinado predicado é falso. Esta 
+negação é representada pelo teorema \texttt{-}. 
+
+\
+
+\begin{lstlisting}[caption={Povoamento da base de conhecimento com conhecimento perfeito negativo}]
+-utente(13, 41582, 'Duarte Pedro', date(1987, 6, 2), 'duartepedro@gmail.com', 913654782, 'Coimbra', 
+'Jornalista', [], 3).
+-utente(14, 45217, 'Tiago Loureiro', date(1993, 5, 12), 'tiagoloureiro@gmail.com', 912396755, 
+'Lisboa', 'Enfermeiro', [], 4).
+
+-centro_saude(5, 'Centro Hospitalar Povoa de Varzim', 'Povoa de Varzim', 252690600, 
+'centrohospitalarpovoadevarzim@gmail.com').
+
+-staff(11, 3, 'Igor Rodrigues', 'igorrodrigues@gmail.com').
+-staff(12, 2, 'Ana Mendes', 'anamendes@gmail.com').
+
+-vacinacao_Covid(3, 5, date(2021, 3, 21), 'Pfizer', 1).
+-vacinacao_Covid(3, 5, date(2021, 4, 2), 'Pfizer', 2).
+
+-medico(7, 4, 'Cesar Martins', 'cesarmartins@gmail.com', 'Oftalmologia').
+
+-consulta(3, 1, 4, date(2021,2,15)).
+
+-tratamento(7, 5, 1, date(2021,2,17), 'Radiografia').
+\end{lstlisting}
+
+\pagebreak
+
+\subsection{Representação de Conhecimento Imperfeito}
+
+Na problemática da representação de informação incompleta, os valores nulos
+surgem com o objetivo de distinguir situações em que as respostas às questões são
+conhecidas e as situações em que as respostas às questões são
+desconhecidas. É neste sentido que surgem os três tipos de conhecimento imperfeito -- incerto, 
+impreciso e interdito -- 
+que são essenciais para todo um alargar de possibilidades de respostas às questões com base nas 
+fontes de conhecimento existentes.
+
+
+\subsubsection{Conhecimento Imperfeito Incerto}
+
+Este tipo de conhecimento corresponde ao conhecimento para o qual não existe nenhuma prova que 
+comprove que este seja verdadeiro ou falso. Trata-se, portanto, de um valor nulo do tipo 
+desconhecido e não necessariamente de um conjunto de
+valores. 
+
+Desta forma, o conhecimento imperfeito incerto diz respeito a conhecimento desconhecido de
+um determinado campo do predicado, dentro de um conjunto ilimitado de hipóteses.
+
+\subsubsection*{Utente}
+
+No nosso caso de estudo, isto pode ser caracterizado pela situação em que se sabe que
+existe um utente com ID igual a 15, chamado Mateus, mas que não se sabe qual a sua idade, uma vez 
+que a sua data de nascimento é desconhecida. Neste caso, isto é definido como conhecimento 
+incerto visto que não se sabe qual é a sua data de nascimento, nem se tem uma ideia de qual possa 
+ser. Para
+representar este tipo conhecimento, é necessário criar o utente mencionado com
+\texttt{data\_desconhecida} no campo relativo à data de nascimento e criar uma exceção que 
+indique que quando se questionar a base de conhecimento relativamente ao utente com 
+\texttt{data\_desconhecida}, o resultado deverá ser \textit{desconhecido}.
+
+\
+
+\begin{lstlisting}[caption={Conhecimento Imperfeito Incerto relativo ao utente}]
+% Nao se conhece a idade do utente #15 uma vez que a sua data de nascimento e desconhecida
+utente(15, 56257, 'Mateus Silva', data_desconhecida, 'mateussilva@gmail.com', 915698401,
+       'Coimbra', 'Bombeiro', [], 4).
+excecao(utente(ID, NUM, NOME, DN, EMAIL, TLF, M, P, DC, CS)) :-
+        utente(ID, NUM, NOME, data_desconhecida, EMAIL, TLF, M, P, DC, CS).
+
+\end{lstlisting}
+
+\subsubsection*{Centro de Saúde}
+
+Relativamente ao centro de saúde, o conhecimento imperfeito incerto surge quando, por exemplo, 
+não se conhece o número de telefone. 
+De forma análoga, é necessário criar o centro de saúde mencionado com
+\texttt{telefone\_desconhecido} no campo relativo ao telefone e criar uma exceção que indique que 
+quando se questionar a base de conhecimento relativamente ao centro de saúde com 
+\texttt{telefone\_desconhecido}, o resultado deverá ser \textit{desconhecido}.
+
+\
+
+\begin{lstlisting}[caption={Conhecimento Imperfeito Incerto relativo ao centro de saúde}]
+% Nao se conhece o telefone do centro de saude #6
+centro_saude(6, 'Hospital da Luz', telefone_desconhecido, 'Guimaraes',
+             'hospitaldaluz@gmail.com').
+excecao(centro_saude(ID, NOME, M, TLF, EMAIL)) :- 
+    centro_saude(ID, NOME, M, telefone_desconhecido, EMAIL).
+\end{lstlisting}
+
+\subsubsection*{\textit{Staff}}
+
+No que diz respeito ao \textit{staff} de um centro de saúde, o conhecimento imperfeito incerto 
+surge quando, por exemplo, não se 
+conhece o ID do centro de saúde em que um que funcionário exerce funções. Desta forma, é 
+necessário criar o funcionário mencionado com
+\texttt{idc\_desconhecido} no campo relativo ao ID do centro em que este exerce funções e criar 
+uma exceção que indique que quando
+se questionar a base de conhecimento relativamente ao funcionário com \texttt{idc\_desconhecido}, 
+o resultado deverá ser \textit{desconhecido}.
+
+\
+
+\begin{lstlisting}[caption={Conhecimento Imperfeito Incerto relativo ao \textit{staff} do centro de 
+saúde}]
+% Nao se sabe em que centro de saude o Antonio exerce funcoes
+staff(13, idc_desconhecido, 'Antonio Gomes', 'antoniogomes@gmail.com').
+excecao(staff(IDS, IDCENTRO, NOME, EMAIL)) :- 
+    staff(IDS, idc_desconhecido, NOME, EMAIL).
+\end{lstlisting}
+
+\subsubsection*{Vacinação}
+
+O conhecimento imperfeito incerto surge associado aos registos de vacinação quando, por exemplo, 
+não se conhece com que vacina
+um determinado utente foi vacinado. Desta forma, é necessário criar o registo de vacinação 
+mencionado com
+\texttt{vacina\_desconhecida} no campo relativo à vacina e criar uma exceção que indique que 
+quando
+se questionar a base de conhecimento relativamente a um registo de vacinação com 
+\texttt{vacina\_desconhecida}, o resultado deverá ser \textit{desconhecido}.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Incerto relativo aos registos de vacinação}]
+% Nao se sabe com que vacina o utente #7 foi vacinado
+vacinacao_Covid(1, 7, date(2020,3,21), vacina_desconhecida, 1).
+excecao(vacinacao_Covid(STAFF, UTENTE, DATA, VACINA, TOMA)) :-
+    vacinacao_Covid(STAFF, UTENTE, DATA, vacina_desconhecida, TOMA).
+\end{lstlisting}
+
+
+\subsubsection*{Médico}
+
+O conhecimento imperfeito incerto surge associado ao médico quando, por exemplo, não se conhece a 
+sua especialidade. Assim, à semelhança do que foi referido anteriormente, é necessário criar o 
+médico mencionado com
+\texttt{especialidade\_desconhecida} no campo relativo à especialidade médica e criar uma 
+exceção que indique que quando se questionar a base de conhecimento relativamente a um médico 
+com \texttt{especialidade\_desconhecida}, o resultado deverá ser \textit{desconhecido}.
+
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Incerto relativo ao médico}]
+% Nao se conhece a especialidade do medico #8
+medico(8, 2, 'Henrique Ferreira', 'henriqueferreira@gmail',
+       especialidade_desconhecida).
+excecao(medico(ID, IDCENTRO, NOME, EMAIL, ESP)) :-
+    medico(ID, IDCENTRO, NOME, EMAIL, especialidade_desconhecida).
+\end{lstlisting}
+
+\subsubsection*{Consulta}
+
+O conhecimento imperfeito incerto surge associado a uma consulta quando, por exemplo, não se 
+conhece qual o ID do utente que foi à consulta. Desta forma, é necessário criar o registo da 
+consulta com
+\texttt{utente\_desconhecido} no campo relativo ao utente e criar uma exceção que indique que 
+quando se questionar a base de conhecimento relativamente a uma consulta com 
+\texttt{utente\_desconhecido}, o resultado deverá ser \textit{desconhecido}.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Incerto relativo à consulta}]
+% Nao se sabe qual o utente que foi a consulta
+consulta(4, utente_desconhecido, 2, date(2021,2,15)).
+excecao(consulta(IDM, IDU, IDC, DATA)) :-
+    consulta(IDM, utente_desconhecido, IDC, DATA).
+\end{lstlisting}
+
+
+\subsubsection*{Tratamento}
+
+Seguindo um raciocínio idêntico, o conhecimento imperfeito incerto surge associado a um 
+tratamento quando, por exemplo, não se conhece qual o ID do funcionário responsável pelo mesmo. 
+Desta forma, é necessário criar o registo do tratamento com
+\texttt{ids\_desconhecido} no campo relativo ao funcionário e criar uma exceção que indique que 
+quando se questionar a base de conhecimento relativamente a um tratamento com 
+\texttt{ids\_desconhecido}, o resultado deverá ser \textit{desconhecido}. 
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Incerto relativo ao tratamento}]
+% Nao se sabe qual o elemento do staff do centro de saude responsavel pelo tratamentos
+tratamento(ids_desconhecido, 1, 4, date(2020,11,4), 'Biopsia').
+excecao(tratamento(IDS, IDU, IDC, DATA, DSCR)) :-
+    tratamento(ids_desconhecido, IDU, IDC, DATA, DSCR).
+\end{lstlisting}
+
+\pagebreak
+
+\subsubsection{Conhecimento Imperfeito Impreciso}
+
+Tal como o conhecimento desconhecido, este tipo corresponde ao
+conhecimento para o qual não há provas de que este seja verdadeiro ou falso.
+No entanto, este insere-se num conjunto de valores conhecidos.
+
+Assim, qualquer que seja a resposta ao predicado que utilize um valor fora
+desse conjunto, o resultado será \textit{desconhecido}, uma vez que apenas se sabe que o
+valor se encontra contido dentro desse conjunto.
+
+\subsubsection*{Utente}
+
+Neste caso de estudo temos, por exemplo, a situação de sabermos que existe
+um utente com ID igual a 9, chamado Pedro Reis, mas que não sabemos se mora em Braga ou no Porto. 
+De forma a contornar esta situação, através do uso de
+exceções, podemos construir essas duas alternativas de modo a que quando a base de
+conhecimento for questionada relativamente a este utente a resposta seja \textit{desconhecido} se a
+morada for Braga ou Porto, e a resposta ser \textit{falso}, caso a
+base de conhecimento seja questionada com a especialidade diferente destas.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Impreciso relativo ao utente}]
+ % Nao se sabe se a Teresa mora em Braga ou no Porto
+excecao(utente(16, 59240, 'Teresa Soares', date(1998, 1, 23), 'teresasoares@gmail.com', 913654700, 
+'Braga', 'Estudante',
+               ['Hipertensao'], 1)).
+excecao(utente(16, 59240, 'Teresa Soares', date(1998, 1, 23), 'teresasoares@gmail.com', 913654700, 
+'Porto', 'Estudante',
+               ['Hipertensao'], 1)).
+\end{lstlisting}
+
+\subsubsection*{Centro de Saúde}
+
+O conhecimento imperfeito impreciso surge associado ao centro de saúde quando, por exemplo, se 
+sabe que existe um centro de saúde mas não se conhece a sua morada. A título de exemplo, 
+considere-se o Hospital De Santiago, que não se sabe se se situa em Setúbal ou Lisboa. De forma a 
+contornar esta situação, através do uso de exceções, podemos construir essas duas alternativas 
+de modo a que quando a base de
+conhecimento for questionada relativamente a este centro saúde a resposta seja 
+\textit{desconhecido} se a
+morada for Setúbal ou Lisboa, e a resposta ser \textit{falso}, caso a
+base de conhecimento seja questionada com uma morada diferente destas.
+
+\pagebreak
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Impreciso relativo ao centro de saúde}]
+% Nao se sabe se o centro de saude #7 esta localizado em Setubal ou em Lisboa
+excecao(centro_saude(7, 'Hospital De Santiago', 'Setubal', 265509200,
+        'hospitaldesantiago@gmail.com')).
+excecao(centro_saude(7, 'Hospital De Santiago', 'Lisboa', 265509200,
+        'hospitaldesantiago@gmail.com')).
+\end{lstlisting}
+
+\subsubsection*{\textit{Staff}}
+
+Neste caso de estudo temos, por exemplo, a situação de sabermos que existe
+um funcionário com ID igual a 14, chamado Jorge Carvalho, mas que não sabemos se exerce funções 
+no centro de saúde \#2 ou \#3. De forma a contornar esta situação, através do uso de
+exceções, podemos construir essas duas alternativas de modo a que quando a base de
+conhecimento for questionada relativamente a este funcionário a resposta seja 
+\textit{desconhecido} se o ID do centro de saúde for 2 ou 3, e a resposta ser \textit{falso}, caso 
+a
+base de conhecimento seja questionada com um ID diferente.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Impreciso relativo ao \textit{staff} do centro 
+de saúde}]
+% Nao se sabe se o Jorge exerce funcoes no centro de saude #2 ou no #3
+excecao(staff(14, 2, 'Jorge Carvalho', 'jorgecarvalho@gmail.com')).
+excecao(staff(14, 3, 'Jorge Carvalho', 'jorgecarvalho@gmail.com')).
+\end{lstlisting}
+
+
+\subsubsection*{Vacinação}
+
+Neste caso de estudo temos, por exemplo, a situação de sabermos que um utente foi vacinado, mas 
+que não sabemos com que vacina -- apenas se sabe que ou foi com a vacina da \textit{Pfizer} ou com 
+a da \textit{AstraZeneca}. De forma a contornar esta situação, através do uso de
+exceções, podemos construir essas duas alternativas de modo a que quando a base de
+conhecimento for questionada relativamente a este registo de vacinação seja \textit{desconhecido} 
+se a vacina utilizada for da \textit{Pfizer} ou da \textit{AstraZeneca}, e a resposta ser 
+\textit{falso}, caso a
+base de conhecimento seja questionada com uma vacina diferente.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Impreciso relativo aos registos de 
+vacinação}]
+excecao(vacinacao_Covid(3, 11, date(2021, 3, 21), 'Pfizer', 1)).
+excecao(vacinacao_Covid(3, 11, date(2021, 3, 21), 'Astrazeneca', 1)).
+\end{lstlisting}
+
+\subsubsection*{Médico}
+
+No presente caso de estudo, temos, por exemplo, a situação de sabermos que existe
+um médico com ID igual a 9, chamado Pedro Reis, mas que não sabemos se é especialista em
+Dermatologia ou em Cardiologia. De forma a contornar esta situação, através do uso de
+exceções, podemos construir essas duas alternativas de modo a que quando a base de
+conhecimento for questionada relativamente a este médico a resposta seja \textit{desconhecido} se a
+especialidade for Dermatologia ou Cardiologia, e a resposta ser \textit{falso}, caso a
+base de conhecimento seja questionada com a especialidade diferente destas.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Impreciso relativo ao médico}]
+% Nao se sabe se o medico #9 e dermatologista ou cardiologista
+excecao(medico(9, 1, 'Pedro Reis', 'pedroreis@gmail.com',
+        'Dermatologia')).
+excecao(medico(9, 1, 'Pedro Reis', 'pedroreis@gzmail.com',
+       'Cardiologia')).
+\end{lstlisting}
+
+\subsubsection*{Consulta}
+
+No caso de estudo apresentado, temos, também, a situação de sabermos que o médico \#8 deu uma 
+consulta, mas não sabemos se o foi o utente \#5 ou \#8 que foi à consulta. De forma a contornar 
+esta situação, através do uso de
+exceções, podemos construir essas duas alternativas de modo a que quando a base de
+conhecimento for questionada relativamente a esta consulta, a resposta seja \textit{desconhecido} 
+se a
+o ID do utente for 5 ou 8, e a resposta ser \textit{falso} caso a
+base de conhecimento seja questionada com um ID diferente.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Impreciso relativo à consulta}]
+% Nao se sabe se foi o utente #5 ou #8 que foi a consultas
+excecao(consulta(4, 5, 2, date(2021,3,1))).
+excecao(consulta(4, 8, 2, date(2021,3,1))).
+\end{lstlisting}
+
+\subsubsection*{Tratamento}
+
+No caso de estudo apresentado, temos, por fim, a situação de sabermos que o o utente \#8 realizou 
+uma prova de esforço, mas não sabemos se o funcionário responsável foi o funcinário \#3 ou 
+\#5. De forma a contornar esta situação, através do uso de
+exceções, podemos construir essas duas alternativas de modo a que quando a base de
+conhecimento for questionada relativamente a este tratamento, a resposta seja \textit{desconhecido} 
+se a
+o ID do funcionário for 3 ou 5, e a resposta ser \textit{falso} caso a
+base de conhecimento seja questionada com um ID diferente.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Impreciso relativo ao tratamento}]
+% Nao se sabe se foi o elemento do staff do centro de saude #3 ou #5 responsavel pelo tratamento
+excecao(tratamento(3, 8, 2, date(2020,12,15), 'Prova de Esforco')).
+excecao(tratamento(5, 8, 2, date(2020,12,15), 'Prova de Esforco')).
+\end{lstlisting}
+
+\
+
+Por fim, importa salientar ainda que apesar de termos criado exemplos para todos os
+predicados, apenas é sentida uma diferença significativa na resposta por parte do sistema
+de inferência no caso de predicados assentes no PMF -- \texttt{utente}, \texttt{staff} e 
+\texttt{medico}. Apenas nestes
+casos é que o sistema de inferência dá \textit{falso} como resultado caso a base de
+conhecimento não seja questionada com as alternativas existentes nas exceções
+construídas, e dá \textit{desconhecido} caso seja questionada com uma das alternativas. 
+
+\subsubsection{Conhecimento Imperfeito Interdito}
+
+Este último tipo de conhecimento, para além de caracterizar um tipo de dados
+desconhecido, caracteriza também, um tipo de dados que não se admite que surja na
+base de conhecimento.
+Nesta situação, o valor nulo para além de identificar um valor desconhecido,
+representará um valor que não é permitido especificar ou conhecer e qualquer
+tentativa para a concretizar será rejeitada como sendo provocadora de inconsistência
+na informação presente na base de conhecimento.
+
+Desta forma, este tipo de conhecimento, para além de
+identificar os valores desconhecidos, não permite que haja evolução desse conhecimento, isto é, 
+não
+é permitido especificar ou conhecer o seu valor.
+
+\subsubsection*{Utente}
+
+Para mostrar este tipo de conhecimento criou-se um utente chamado Diogo, identificado pelo ID 17, 
+do qual
+não se conhece o número de Segurança Social -- representado por \texttt{sc\_desconhecido}. Como 
+neste tipo de conhecimento
+é impossível alguma vez descobrir o número de Segurança Social utente, torna-se necessário 
+criar um invariante que não permita
+a evolução deste conhecimento (abordado na secção \ref{sec:inv_interdito}) e para isso, 
+criou-se um predicado nulo para identificar o \texttt{sc\_desconhecido}.
+Desta forma, ao procurar por um utente, se existir o predicado \texttt{nulo(sc\_desconhecido)}, 
+nunca vai ser
+possível evoluir as informações relativas ao número de Segurança Social deste utente.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Interdito relativo ao utente}]
+% Nao se sabe nem e possivel saber qual o numero de Seguranca Social do utente #17
+utente(17, sc_desconhecido, 'Diogo Fernandes', date(1995, 9, 5),
+       'diogofernandes@gmail.com', 924581465, 'Lisboa', [], 4).
+nulo(sc_desconhecido).
+excecao(utente(ID, _, NOME, DN, EMAIL, TLF, M, P, DC, CS)) :-
+    utente(ID, sc_desconhecido, NOME, DN, EMAIL, TLF, M, P, DC, CS).
+\end{lstlisting}
+
+\subsubsection*{Centro de Saúde}
+
+De forma análoga, neste caso de estudo temos, por exemplo, a situação de existir um centro de 
+saúde do qual não se conhece o telefone -- representado por \texttt{tlf\_desconhecido}. Como 
+neste tipo de conhecimento
+é impossível alguma vez descobrir o telefone do centro de saúde, torna-se necessário criar um 
+invariante que não permita a evolução deste conhecimento (abordado secção 
+\ref{sec:inv_interdito}) e para isso, criou-se um predicado nulo para identificar o 
+\texttt{tlf\_desconhecido}.
+Desta forma, ao procurar por um centro de saúde, se existir o predicado 
+\texttt{nulo(tlf\_desconhecido)}, nunca vai ser
+possível evoluir as informações relativas ao telefone deste centro de saúde.
+
+\pagebreak
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Interdito relativo ao centro de saúde}]
+% Nao se sabe nem e possivel saber o telefone do centro de saude #8
+centro_saude(8, 'Hospital da Misericordia de Evora', 'Evora',
+             tlf_desconhecido,
+             'hospitaldamisericordiadeevora@gmail.com').
+nulo(tlf_desconhecido).
+excecao(centro_saude(ID, NOME, M, _, EMAIL)) :-
+    centro_saude(ID, NOME, M, tlf_desconhecido, EMAIL).
+\end{lstlisting}
+
+\subsubsection*{\textit{Staff}}
+
+Neste caso de estudo temos, por exemplo, a situação de existir um funcionário de um centro de 
+saúde do qual não se conhece o email -- representado por \texttt{email\_desconhecido}. Como neste 
+tipo de conhecimento
+é impossível alguma vez descobrir o \textit{email} do funcionário, torna-se necessário criar um 
+invariante que não permita a evolução deste conhecimento (abordado secção 
+\ref{sec:inv_interdito}) e para isso, criou-se um predicado nulo para identificar o 
+\texttt{email\_desconhecido}.
+Assim, ao procurar por um funcionário, se existir o predicado \texttt{nulo(email\_desconhecido)}, 
+nunca vai ser
+possível evoluir as informações relativas ao \textit{email} deste funcionário.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Interdito relativo ao \textit{staff} do centro 
+de saúde}]
+% Nao se conhece nem e possivel conhecer o email do Rafael
+staff(15, 1, 'Rafael Costa', email_desconhecido).
+nulo(email_desconhecido).
+excecao(staff(IDS, IDCENTRO, NOME, _)) :-
+    staff(IDS, IDCENTRO, NOME, email_desconhecido).
+\end{lstlisting}
+
+\subsubsection*{Vacinação}
+
+Pode também a situação de existir registo de vacinação do qual não se conhece qual a vacina 
+administrada -- representada por \texttt{vac\_desconhecida}. Como neste tipo de conhecimento
+é impossível alguma vez descobrir qual a vacina administrada, torna-se necessário criar um 
+invariante que não permita a evolução deste conhecimento (abordado secção 
+\ref{sec:inv_interdito}) e para isso, criou-se um predicado nulo para identificar a 
+\texttt{vac\_desconhecida}.
+Assim, ao procurar por um registo de vacinação, se existir o predicado 
+\texttt{nulo(vac\_desconhecida)}, nunca vai ser
+possível evoluir as informações relativas ao registo de vacinação.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Interdito relativo aos registos de 
+vacinação}]
+% Nao se conhece nem e possivel conhecer qual a vacina administrada
+vacinacao_covid(3, 12, date(2021, 7, 17), vac_desconhecida, 1).
+nulo(vac_desconhecida).
+excecao(vacinacao_Covid(STAFF, UTENTE, DATA, _, TOMA)) :-
+    vacinacao_Covid(STAFF, UTENTE, DATA, vac_desconhecida, TOMA).
+\end{lstlisting}
+
+\subsubsection*{Médico}
+
+Considere-se também a situação de existir um médico do qual não se conhece qual o centro de 
+saúde em que exerce funções -- representado por \texttt{centro\_desconhecido}. Como neste tipo 
+de conhecimento
+é impossível alguma vez descobrir qual o centro de saúde em que este exerce funções, torna-se 
+necessário criar um invariante que não permita a evolução deste conhecimento (abordado secção 
+\ref{sec:inv_interdito}) e para isso, criou-se um predicado nulo para identificar o 
+\texttt{centro\_desconhecido}.
+Assim, ao procurar por um médico, se existir o predicado \texttt{nulo(centro\_desconhecido)}, 
+nunca vai ser
+possível evoluir as informações relativas ao médico.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Interdito relativo ao médico}]
+% Nao se sabe nem e possivel saber em que centro de saude o medico #10 exerce funcoes
+medico(10, centro_desconhecido, 'Rui Costa', 'ruicosta@gmail.com',
+       'Otorrinolaringologia').
+nulo(centro_desconhecido).
+excecao(medico(ID, _, NOME, EMAIL, ESP)) :-
+    medico(ID, centro_desconhecido, NOME, EMAIL, ESP).
+\end{lstlisting}
+
+\subsubsection*{Consulta}
+
+Neste caso de estudo temos, por exemplo, a situação de não se saber qual o utente que foi a uma 
+consulta -- representado por \texttt{ut\_desconhecido}. Como neste tipo de conhecimento
+é impossível alguma vez descobrir qual o utente em questão, torna-se necessário criar um 
+invariante que não permita a evolução deste conhecimento (abordado secção 
+\ref{sec:inv_interdito}) e para isso, criou-se um predicado nulo para identificar o 
+\texttt{ut\_desconhecido}.
+Assim, ao procurar por uma consulta, se existir o predicado \texttt{nulo(ut\_desconhecido)}, nunca 
+vai ser
+possível evoluir as informações relativas à consulta em questão.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Interdito relativo à consulta}]
+% Nao se sabe nem e possivel saber o utente que foi a consulta
+consulta(4, ut_desconhecido, 2, date(2021,1,15)).
+nulo(ut_desconhecido).
+excecao(consulta(IDM, _, IDC, DATA)) :-
+    consulta(IDM, ut_desconhecido, IDC, DATA).
+\end{lstlisting}
+
+\subsubsection*{Tratamento}
+
+Por fim, existe também a situação de não se saber qual o centro de saúde em que um tratamento 
+foi realizado -- representado por \texttt{cs\_desconhecido}. Como neste tipo de conhecimento
+é impossível alguma vez descobrir qual o centro de saúde em questão, torna-se necessário criar 
+um invariante que não permita a evolução deste conhecimento (abordado secção 
+\ref{sec:inv_interdito}) e para isso, criou-se um predicado nulo para identificar o 
+\texttt{cs\_desconhecido}.
+Assim, ao procurar por um tratamento, se existir o predicado \texttt{nulo(cs\_desconhecido)}, nunca 
+vai ser
+possível evoluir as informações relativas à consulta em questão.
+
+\
+
+\begin{lstlisting} [caption={Conhecimento Imperfeito Interdito relativo ao tratamento}]
+% Nao se conhece nem e possivel conhecer qual o centro de saude em que o tratamento foi realizado
+tratamento(7, 5, cs_desconhecido, date(2020,11,20), 'Exame Pulmonar').
+nulo(cs_desconhecido).
+excecao(tratamento(IDS, IDU, IDC, _, DSCR)) :-
+    tratamento(IDS, IDU, cs_desconhecido, DATA, DSCR).
+\end{lstlisting}
+
+\pagebreak
+
+\subsection{Invariantes}
+
+Para que a Base de Conhecimento funcione corretamente, é indispensável garantir certas 
+condições responsáveis pelo controlo da inserção e remoção de conhecimento.
+
+Para esse efeito, foi desenvolvido, já na primeira fase do trabalho prático, uma série de 
+invariantes responsáveis por este controlo que optaremos por não tornar a incluir neste 
+relatório.
+
+Contudo, para além deste controlo da inserção e remoção, acaba por ser também imperativo 
+garantir igualmente o controlo da:
+
+\begin{itemize}
+    \item Inserção de conhecimento perfeito positivo e negativo;
+    \item Inserção de conhecimento imperfeito interdito.
+\end{itemize}
+
+\subsubsection{Invariantes Universais}
+
+Existem alguns invariantes que podem ser generalizados e, desta forma, todos os
+predicados que serão inseridos na nossa base de conhecimento terão que obedecer a esses
+invariantes.
+Em primeiro lugar, construímos invariantes que garantem que não existe
+conhecimento perfeito positivo e conhecimento perfeito negativo repetido na nossa base de
+conhecimento, ou seja, que não existe conhecimento redundante, tal como se pode ver de seguida.
+
+\
+
+\begin{lstlisting}[caption={Invariantes relativos ao conhecimento repetido}]
+% Invariante que garante que nao existe conhecimento perfeito positivo repetido
++T :: (solucoes(T, T, R),
+       comprimento(R, 1)).
+
+% Invariante que garante que nao existe conhecimento perfeito negativo repetido
++(-T) :: (solucoes(T, -T, R),
+          comprimento(R, 1)).
+\end{lstlisting}
+
+\
+
+Por outro lado, foram também criados invariantes que não permitem que seja adicionado 
+conhecimento perfeito positivo que contradiz conhecimento perfeito negativo
+presente na base de conhecimento e vice-versa.
+Estes invariantes, apresentados de seguida, são essenciais para que a informação existente seja 
+coerente e não seja contraditória.
+
+\
+
+\begin{lstlisting}[caption={Invariante relativos ao conhecimento contraditório}]
+% Invariante que nao permite adicionar conhecimento perfeito positivo que contradiz conhecimento 
+perfeito negativo
++T :: nao(-T).
+
+% Invariante que nao permite adicionar conhecimento perfeito negativo que contradiz conhecimento 
+perfeito positivo
++(-T) :: nao(T).
+\end{lstlisting}
+
+\subsection{Invariantes Estruturais e Referenciais}
+
+Os invariantes são completamente indispensáveis para um correto funcionamento
+de todo o sistema. Apenas com a sua introdução é possível efetuar um controlo da informação 
+que inserida e removida, criando,
+assim, um intermediário necessário para que os predicados de evolução e retrocesso funcionem 
+como ambicionado.
+
+Para esta gestão de informação se poder processar da maneira mais adequada e lógica face ao 
+sistema, foram criados, na primeira fase do trabalho prático, invariantes
+associados tanto à inserção como à remoção de conhecimento.
+
+Importa salientar que, em relação ao trabalho desenvolvido na primeira fase, foi acrescentado um 
+invariante que permite a validação da data de nascimento do utente, sendo para que o definir foi 
+necessário definir primeiro o predicado \texttt{verificaData}, apresentado em anexo (secção 
+\ref{sec:aux}). Além disso, foram desenvolvidos invariantes relativos ao conhecimento perfeito 
+negativo, assim como predicados no sentido de não permitir a evolução de conhecimento imperfeito 
+interdito.
+
+\input{invariantes}
+
+\subsection{Invariantes Associados ao Conhecimento Imperfeito Interdito}
+\label{sec:inv_interdito}
+
+\subsubsection*{Utente}
+
+\
+
+\begin{lstlisting}
+% Invariante que impede a insercao de conhecimento perfeito positivo relativo a um utente com 
+numero de Seguranca Social interdito (conhecimento imperfeito interdito)
++utente(ID, NUM, NOME, DN, EMAIL, TLF, M, P, DC, CS) :: (
+    solucoes((ID, NUM, NOME, DN, EMAIL, TLF, M, P, DC, CS),
+             (utente(ID, NUM, NOME, DN, EMAIL, TLF, M, P, DC, CS),
+              nulo(NUM)), S),
+    comprimento(S, N),
+    N == 0
+).
+\end{lstlisting}
+
+\pagebreak
+
+\input{evolucao_involucao}
+
+\pagebreak
+
+\subsection{Sistema de Inferência}
+
+Um sistema de inferência capaz de implementar os mecanismos de raciocínio
+inerentes aos sistemas que anteriormente foram representados é um passo indispensável ser 
+efetuado uma vez que é com este sistema que podemos "criar" uma
+espécie de interpretador de questões.
+
+Assim, a implementação do sistema de inferência começou pela criação do meta-predicado 
+\texttt{demo: Questao, Resposta -> \{V, F\}}, que, para uma determinada questão, e coloca na
+Resposta, um dos valores do conjunto de soluções --  verdadeiro, falso e desconhecido. 
+
+A determinação da resposta sobre a questão colocada através do meta-predicado \texttt{demo} é 
+verdadeira 
+caso exista conhecimento positivo sobre a mesma, falsa caso exista conhecimento negativo, e
+desconhecida caso não exista nenhum dos conhecimentos.
+
+Em termos práticos, considerando uma questão abstrata $q(X)$, em que $X$ pode tomar a forma $X_1, 
+X_2, ..., X_n$, definem-se as seguintes três respostas
+possíveis para essa questão:
+
+\begin{itemize}
+    \item Verdadeiro se $\exists X \ q(X)$
+    \item Falso se $\exists X \ \neg q(X)$
+    \item Desconhecido caso contrário
+\end{itemize}
+
+Neste sentido, foi desenvolvido interpretador
+de questões. Este interpretador de questões trata-se de um predicado que se
+baseia nos diferentes tipos de conhecimento imperfeito.
+
+O predicado \texttt{demo} apresenta uma resposta, mediante uma questão, determinando o seu valor 
+de verdade.
+
+\
+
+\begin{lstlisting}[caption={Extensão do meta-predicado \texttt{demo}}, label={lst:demo}]
+% Extensao do meta-predicado demo: Questao, Resposta -> {V, F, D}
+demo(Questao, verdadeiro) :- Questao.
+demo(Questao, falso) :- -Questao.
+demo(Questao, desconhecido) :- nao(Questao), nao(-Questao).
+\end{lstlisting}
+
+Para complementar esse sistema, foram
+construídos também predicados que permitem fazer conjunções e/ou disjunções de duas ou mais 
+\textit{queries}.
+
+\subsubsection*{Disjunção}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+    $P$          & $Q$          & $P \lor Q$                \\ \hline
+    Verdadeiro   & -            & Verdadeiro                \\ \hline
+    -            & Verdadeiro   & Verdadeiro                \\ \hline
+    Falso        & Falso        & Falso                     \\ \hline
+    Falso        & Desconhecido & Desconhecido              \\ \hline
+    Desconhecido & Falso        & Desconhecido              \\ \hline
+    Desconhecido & Desconhecido & Desconhecido              \\ \hline
+    \end{tabular}
+    \caption{Tabela de verdade da disjunção}
+\end{table}
+
+\subsubsection*{Conjunção}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+    $P$          & $Q$          & $P \land Q$               \\ \hline
+    Verdadeiro   & Verdadeiro   & Verdadeiro                \\ \hline
+    Verdadeiro   & Desconhecido & Desconhecido              \\ \hline
+    Desconhecido & Verdadeiro   & Desconhecido              \\ \hline
+    Desconhecido & Desconhecido & Desconhecido              \\ \hline
+    Falso        & -            & Falso                     \\ \hline
+    -            & Falso        & Falso                     \\ \hline
+    \end{tabular}
+    \caption{Tabela de verdade da conjunção}
+\end{table}
+
+Assim, com o auxílio dos predicados \texttt{disjuncao} e \texttt{conjuncao}, desenvolveu-se o 
+predicado \texttt{demoComp}, que extende a funcionalidade do meta-predicado \texttt{demo}, 
+permitindo interpretas uma lista de questões.
+
+\
+
+\begin{lstlisting}[caption={Extensão do predicado \texttt{disjuncao}}]
+% Extensao do predicado disjuncao: X, Y, R -> {V, F, D}
+disjuncao(verdadeiro, _, verdadeiro).
+disjuncao(_, verdadeiro, verdadeiro).
+disjuncao(falso, falso, falso).
+disjuncao(falso, desconhecido, desconhecido).
+disjuncao(desconhecido, falso, desconhecido).
+disjuncao(desconhecido, desconhecido, desconhecido).
+\end{lstlisting}
+
+\
+
+\begin{lstlisting}[caption={Extensão do predicado \texttt{conjuncao}}]
+% Extensao do predicado conjuncao: X, Y, R -> {V, F, D}
+conjuncao(verdadeiro, verdadeiro, verdadeiro).
+conjuncao(verdadeiro, desconhecido, desconhecido).
+conjuncao(desconhecido, verdadeiro, desconhecido).
+conjuncao(desconhecido, desconhecido, desconhecido).
+conjuncao(falso, _, falso).
+conjuncao(_, falso, falso).
+\end{lstlisting}
+
+\
+
+\begin{lstlisting}[caption={Extensão do predicado \texttt{demoComp}}]
+% Extensao do predicado demoComp: Lista, R -> {V, F, D}
+demoComp([Q], R) :- demo(Q,R).
+demoComp([Q1, ou, Q2|T], R) :- demo(Q1, R1),
+                               demoComp([Q2|T], R2),
+                               disjuncao(R1, R2, R).
+demoComp([Q1, e, Q2|T], R) :- demo(Q1, R1),
+                              demoComp([Q2|T], R2),
+                              conjuncao(R1,R2,R).
+\end{lstlisting}
+
+\pagebreak
+
+\section{Conclusão e Trabalho Futuro}
+
+No final deste trabalho prático, foram implementadas todas as funcionalidades requisitadas,
+permitindo a representação de todo o tipo de conhecimento estudado, tanto perfeito (positivo, 
+negativo) como imperfeito (incerto, impreciso e interdito), com vários
+exemplos e demonstrações de cada um deles.
+
+Contrariamente ao que foi feito na primeira fase do trabalho prático, nesta o principal foco foi, 
+não apostar tanto na diversidade de predicados capazes de explorar o sistema em questão, mas 
+garantir que se representava o conhecimento de forma completa,
+exemplificando explicitamente, para os quatro predicados base do enunciado do problema,
+todos os tipos de conhecimento estudados.
+
+Como trabalho futuro, poderia abordar-se a problemática da evolução e involução de 
+conhecimento imperfeito. Além disso, a base de conhecimento poderia ser mais estendida, ainda que 
+o trabalho proposto seja
+suficiente para demonstrar todos os tipos de conhecimento imperfeito bem como os invariantes
+desenvolvidos para a gestão da base de conhecimento.
+
+\pagebreak
+
+\input{anexos}
+
+\pagebreak
+
+\nomenclature[01]{ID}{Identificador}
+\nomenclature[02]{PMF}{Pressuposto do Mundo Fechado}
+
+\printnomenclature
+
+\pagebreak
+
+\begin{thebibliography}{2}
+
+\section*{Referências Bibliográficas}
+
+\bibitem{analide}
+ANALIDE, Cesar, Neves, José\\ 
+"Representação de Informação Incompleta"\\
+Texto Pedagógico, Grupo de Inteligência Artificial, Centro de Ciências e Tecnologias da 
+Computação, Portugal, 1996
+
+\bibitem{analide2}
+ANALIDE, Cesar, NOVAIS, Paulo, Neves, José\\
+"Sugestões para a Redacção de Relatórios Técnicos"\\
+Relatório Técnico, Departamento de Informática, Universidade do Minho, Portugal, 2011
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,126 @@
+\section{Anexos}
+
+\subsection{Predicados Auxiliares}
+\label{sec:aux}
+
+Para o desenvolvimento dos procedimentos requeridos pelo sistema de representação de conhecimento 
+e raciocínio, foi necessário recorrer a vários predicados auxiliares que
+foram extremamente úteis no decorrer de todo o processo.
+Em seguida, apresentam-se esses predicados desenvolvidos.
+
+\subsubsection*{Meta-predicado \texttt{nao}}
+
+O meta-predicado \texttt{nao} devolve o valor de verdade contrário ao termo \texttt{Q}
+passado como parâmetro através da \textit{negação fraca}, isto é, caso exista uma prova 
+afirmativa
+ou negativa explícita de \texttt{Q} na base de conhecimento dá \texttt{no} como resposta e, caso 
+contrário -- \textit{i.e.} na ausência de prova -- dá \texttt{yes}.
+
+\
+
+\begin{lstlisting}[caption={Extensão do meta-predicado \texttt{nao}}]
+% Extensao do meta-predicado nao: Questao -> {V, F}
+% Negacao fraca
+nao(Q) :- Q, !, fail.
+nao(_).
+\end{lstlisting}
+
+\subsubsection*{Predicado \texttt{comprimento}}
+
+O predicado comprimento coloca em \texttt{R} o comprimento da lista passada como argumento.
+
+\
+
+\begin{lstlisting}[caption={Extensão do predicado \texttt{comprimento}}]
+% Extensao do predicado comprimento: S, N -> {V, F}
+comprimento(S, N) :- length(S, N).
+\end{lstlisting}
+
+\subsubsection*{Meta-predicado \texttt{solucoes}}
+
+Utiliza-se este predicado quando se pretende obter a listagem de todas as soluções possíveis 
+\texttt{Z}, para uma dada questão
+\texttt{Y}, cujo formato da lista é especificado por \texttt{X}. Faz-se uso do predicado 
+disponibilizado pelo \texttt{PROLOG},
+\texttt{findall}, uma vez que este não falha na eventualidade de não existir resposta a esta 
+questão, ao contrário do
+que aconteceria com o predicado \texttt{bagof}.
+
+\
+
+\begin{lstlisting}[language=Prolog, caption={Extensão do meta-predicado \texttt{solucoes}}]
+% Extensao do meta-predicado solucoes: X, Y, Z -> {V, F}
+solucoes(X, Y, Z) :- findall(X, Y, Z).
+\end{lstlisting}
+
+\subsection*{Meta-predicado \texttt{teste}}
+
+O meta-predicado \texttt{teste} testa se todos os predicados passados como parâmetro
+são verdadeiros.
+
+\
+
+\begin{lstlisting}[caption={Extensão do meta-predicado \texttt{teste}}]
+% Extensao do meta-predicado teste: L -> {V, F}
+teste([]).
+teste([H|T]) :- H, teste(T).
+\end{lstlisting}
+
+\subsection*{Meta-predicado \texttt{insercao} e \texttt{remocao}}
+
+O meta-predicado \texttt{insercao} coloca \texttt{T} na base de conhecimento no caso de
+sucesso, retornando \texttt{yes}, e retira \texttt{T} no caso de haver retrocesso, retornando 
+\texttt{no}. O meta-
+predicado \texttt{remocao}, por sua vez, faz o oposto, ou seja, remove \texttt{T} da
+base de conhecimento no caso de sucesso, retornando \texttt{yes} e adiciona \texttt{T} no caso de 
+haver retrocesso,
+retornando \texttt{no}.
+
+\
+
+\begin{lstlisting}[caption={Extensão do meta-predicado \texttt{insercao}}]
+% Extensao do meta-predicado insercao: T -> {V, F}
+insercao(T) :- assert(T).
+insercao(T) :- retract(T), !, fail.
+\end{lstlisting}
+
+\
+
+\begin{lstlisting}[caption={Extensão do meta-predicado \texttt{remocao}}]
+% Extensao do meta-predicado remocao: T -> {V, F}
+remocao(T) :- retract(T).
+remocao(T) :- assert(T), !, fail.
+\end{lstlisting}
+
+
+\subsection*{Predicado \texttt{verificaData}}
+
+O predicado \texttt{verificaData} permite determinar se uma determinada data é válida.
+
+\begin{lstlisting}[caption={Extensão do predicado \texttt{verificaData}}]
+% Extensao do predicado verificaData: date(D, M, A) -> {V, F}
+verificaData(date(D, 1, A)) :- D > 0, D =< 31, A > 0.
+verificaData(date(D, 2, A)) :- D > 0, A mod 4 =:= 0, D =< 29, A > 0. 
+verificaData(date(D, 2, A)) :- D > 0, A mod 4 =\= 0, D =< 28, A > 0.
+verificaData(date(D, 3, A)) :- D > 0, D =< 31, A > 0.
+verificaData(date(D, 4, A)) :- D > 0, D =< 30, A > 0.
+verificaData(date(D, 5, A)) :- D > 0, D =< 31, A > 0.
+verificaData(date(D, 6, A)) :- D > 0, D =< 30, A > 0.
+verificaData(date(D, 7, A)) :- D > 0, D =< 31, A > 0.
+verificaData(date(D, 8, A)) :- D > 0, D =< 31, A > 0.
+verificaData(date(D, 9, A)) :- D > 0, D =< 30, A > 0.
+verificaData(date(D, 10, A)) :- D > 0, D =< 31, A > 0.
+verificaData(date(D, 11, A)) :- D > 0, D =< 30, A > 0.
+verificaData(date(D, 12, A)) :- D > 0, D =< 31, A > 0.
+\end{lstlisting}
+
+\pagebreak
+
+\subsection{Base de Conhecimento}
+
+\subsubsection{Conhecimento Perfeito Positivo}
+\label{sec:perfeito_positivo}
+
+\
+
+\input{conhecimento_perfeito_positivo}

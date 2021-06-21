@@ -1,0 +1,571 @@
+\subsubsection{Invariantes Associados à Inserção de Conhecimento}
+
+No que diz respeito à inserção de conhecimento, foram criados invariantes que impedem a 
+inserção de conhecimento repetido.
+Adicionalmente, foi necessário construír um conjunto de invariantes que não possibilitasse a 
+inserção de informação impossível
+de se introduzir na base de conhecimento em questão.
+
+\subsubsection*{Utente}
+Considerou-se que os IDs não se poderiam de forma alguma repetir uma vez que identificam 
+univocamente cada um dos utentes.
+Para além disso, foi tido em consideração o facto de estes serem representados por números 
+inteiros. Por outro lado, é
+necessário garantir que o centro de saúde que o utente frequenta existe de facto. Por fim, foi 
+tido em consideração o facto
+de não poder existir mais do que um utente com mesmo número de Segurança Social. Todas estas 
+restrições são impostas
+pelos seguintes invariantes:
+
+\
+
+\begin{lstlisting}[caption={Invariantes de inserção relativos ao predicado \texttt{utente}}]
+% O ID do utente deve ser um numero inteiro e deve ser unico
++utente(ID, _, _, _, _, _, _, _, _, _) :: (
+    integer(ID),
+    solucoes(ID, utente(ID, _, _, _, _, _, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O ID do utente deve ser um numero inteiro e deve ser unico
+% Conhecimento perfeito negativo
++(-utente(ID, _, _, _, _, _, _, _, _, _)) :: (
+    integer(ID),
+    solucoes(ID, utente(ID, _, _, _, _, _, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O utente tem de estar associado a um centro de saude que exista
++utente(_, _, _, _, _, _, _, _, _, CS) :: (
+    solucoes(CS, centro_saude(CS, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O utente tem de estar associado a um centro de saude que exista
+% Conhecimento perfeito negativo
++(-utente(_, _, _, _, _, _, _, _, _, CS)) :: (
+    solucoes(CS, centro_saude(CS, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% So pode existir um utente com um determinado numero de Seguranca Social
++utente(_, NUM, _, _, _, _, _, _, _, _) :: (
+    solucoes(NUM, utente(_, NUM, _, _, _, _, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% So pode existir um utente com um determinado numero de Seguranca Social
+% Conhecimento perfeito negativo
++(-utente(_, NUM, _, _, _, _, _, _, _, _)) :: (
+    solucoes(NUM, utente(_, NUM, _, _, _, _, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% A data de nascimento do utente deve ser uma data valida
++utente(_, _, _, DN, _, _, _, _, _, _) :: (verificaData(DN)).
+
+% A data de nascimento do utente deve ser uma data valida
+% Conhecimento perfeito negativo
++(-utente(_, _, _, DN, _, _, _, _, _, _)) :: (verificaData(DN)).
+
+% Invariante que impede a insercao de conhecimento perfeito positivo relativo a um utente com 
+numero de Seguranca Social interdito (conhecimento imperfeito interdito)
++utente(ID, NUM, NOME, DN, EMAIL, TLF, M, P, DC, CS) :: (
+    solucoes((ID, NUM, NOME, DN, EMAIL, TLF, M, P, DC, CS),
+             (utente(ID, NUM, NOME, DN, EMAIL, TLF, M, P, DC, CS),
+              nulo(NUM)), S),
+    comprimento(S, N),
+    N == 0
+).
+
+\end{lstlisting}
+
+\subsubsection*{\textit{Staff}}
+
+Seguindo um raciocínio idêntico, os IDs dos elementos do \textit{staff} de um centro de saúde, 
+além de serem representados
+por números inteiros, não se podem repetir. Além disso é necessário garantir que o centro de 
+saúde em que o elemento do
+\textit{staff} presta serviços existe de facto, restrições essas que são impostas pelos 
+seguintes invariantes.
+
+\
+
+\begin{lstlisting}[caption={Invariantes de inserção relativos ao predicado \texttt{staff}}]
+% O ID de cada elemento do staff do centro de saude deve ser um numero inteiro e deve ser unico
++staff(ID, _, _, _) :: (
+    integer(ID),
+    solucoes(ID, staff(ID, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O ID de cada elemento do staff do centro de saude deve ser um numero inteiro e deve ser unico
+% Conhecimento perfeito negativo
++(-staff(ID, _, _, _)) :: (
+    integer(ID),
+    solucoes(ID, staff(ID, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% Cada elemento do staff do centro de saude tem de estar associado a um centro de saude que exista
++staff(_, CS, _, _) :: (
+    solucoes(CS, centro_saude(CS, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% Cada elemento do staff do centro de saude tem de estar associado a um centro de saude que exista
+% Conhecimento perfeito negativo
++(-staff(_, CS, _, _)) :: (
+    solucoes(CS, centro_saude(CS, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+`\pagebreak`
+% Invariante que impede a insercao de conhecimento perfeito positivo relativo a um funcionario com 
+email interdito (conhecimento imperfeito interdito)
++staff(IDS, IDCENTRO, NOME, EMAIL) :: (
+    solucoes((IDS, IDCENTRO, NOME, EMAIL),
+              (staff(IDS, IDCENTRO, NOME, EMAIL), nulo(EMAIL)), S),
+    comprimento(S, N),
+    N == 0
+).
+
+\end{lstlisting}
+
+\subsubsection*{Centro de Saúde}
+Uma vez que o ID, representado por um número inteiro, identifica univocamente um centro de saúde, 
+não é possível a existência
+de mais do que um centro de saúde com o mesmo ID, restrição essa que é imposta pelo seguinte 
+invariante:
+
+\
+
+\begin{lstlisting}[caption={Invariante de inserção relativo ao predicado \texttt{centro\_saude}}]
+% O ID do centro de saude deve ser um numero inteiro e deve ser unico
++centro_saude(ID, _, _, _, _) :: (
+    integer(ID),
+    solucoes(ID, centro_saude(ID, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O ID do centro de saude deve ser um numero inteiro e deve ser unico
+% Conhecimento perfeito negativo
++(-centro_saude(ID, _, _, _, _)) :: (
+    integer(ID),
+    solucoes(ID, centro_saude(ID, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% Invariante que impede a insercao de conhecimento perfeito positivo relativo a um centro de saude 
+com telefone interdito (conhecimento imperfeito interdito)
++centro_saude(ID, NOME, M, TLF, EMAIL) :: (
+    solucoes((ID, NOME, M, TLF, EMAIL),
+             (centro_saude(ID, NOME, M, TLF, EMAIL),
+              nulo(TLF)), S),
+    comprimento(S, N),
+    N == 0
+).
+\end{lstlisting}
+
+\subsubsection*{Vacinação}
+De forma a que um registo de vacinação seja válido, este tem de estar associado a um elemento do 
+\textit{staff} e a um
+utente que, de facto, existam na base de conhecimento. Além disso, a toma da vacina só pode 
+assumir os valores 1 e 2,
+sendo estritamente necessário que a segunda toma ocorra após a primeira. Note-se também que não 
+é permitida a inserção de
+registos repetidos. Todas estas restrições são impostas pelos seguintes invariantes:
+
+\
+
+\begin{lstlisting}[caption={Invariantes de inserção relativos ao predicado 
+\texttt{vacinacao\_covid}}]
+% Nao permite a insercao de registos duplicados
++vacinacao_Covid(STAFF, UTENTE, DATA, VACINA, TOMA) :: (
+    solucoes((STAFF, UTENTE, DATA, VACINA, TOMA),
+              vacinacao_Covid(STAFF, UTENTE, DATA, VACINA, TOMA), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% Nao permite a insercao de registos duplicados
+% Conhecimento perfeito negativo
++(-vacinacao_Covid(STAFF, UTENTE, DATA, VACINA, TOMA)) :: (
+    solucoes((STAFF, UTENTE, DATA, VACINA, TOMA),
+              vacinacao_Covid(STAFF, UTENTE, DATA, VACINA, TOMA), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O registo de vacinacao tem de estar associado a um elemento do staff que exista
++vacinacao_covid(IDS, _, _, _) :: (
+    solucoes(IDS, staff(IDS, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O registo de vacinacao tem de estar associado a um elemento do staff que exista
+% Conhecimento perfeito negativo
++(-vacinacao_covid(IDS, _, _, _)) :: (
+    solucoes(IDS, staff(IDS, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O registo de vacinacao tem de estar associado a um utente que existe
++vacinacao_covid(_, IDU, _, _, _) :: (
+    solucoes(IDU, utente(IDU, _, _, _, _, _, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+`\pagebreak`
+% O registo de vacinacao tem de estar associado a um utente que existe
+% Conhecimento perfeito negativo
++(-vacinacao_covid(_, IDU, _, _, _)) :: (
+    solucoes(IDU, utente(IDU, _, _, _, _, _, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% A toma da vacina so pode assumir os valores 1 e 2
++vacinacao_covid(_, _, _, _, T) :: (T > 0, T =< 2).
+
+% A toma da vacina so pode assumir os valores 1 e 2
+% Conhecimento perfeito negativo
++(-vacinacao_covid(_, _, _, _, T)) :: (T > 0, T =< 2).
+
+% A segunda toma da vacina so pode ser adminstrada apos a primeira
++vacinacao_covid(_, IDU, _, _, 2) :: (
+    solucoes(IDU, vacinacao_covid(_, IDU, _, _, 1), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% A segunda toma da vacina so pode ser adminstrada apos a primeira
+% Conhecimento perfeito negativo
++(-vacinacao_covid(_, IDU, _, _, 2)) :: (
+    solucoes(IDU, vacinacao_covid(_, IDU, _, _, 1), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% Invariante que impede a insercao de conhecimento perfeito positivo relativo a um registo de 
+vacinacao com vacina interdita (conhecimento imperfeito interdito)
++vacinacao_Covid(STAFF, UTENTE, DATA, VACINA, TOMA) :: (
+    solucoes((STAFF, UTENTE, DATA, VACINA, TOMA),
+             (vacinacao_Covid(STAFF, UTENTE, DATA, VACINA, TOMA),
+              nulo(VACINA)), S),
+    comprimento(S, N),
+    N == 0
+).
+
+\end{lstlisting}
+
+\pagebreak
+
+\subsubsection*{Médico}
+O ID, representado por um número inteiro, identifica univocamente um médico e, por isso, não é 
+possível a existência de
+mais do que um médico com o mesmo ID. Por outro lado, é imperativo que o médica exerça 
+funções num centro de saúde que,
+de facto, exista.
+
+\
+
+\begin{lstlisting}[caption={Invariantes de inserção relativos ao predicado \texttt{medico}}]
+% O ID do medico deve ser um numero inteiro e este deve ser unico
++medico(ID, _, _, _, _) :: (
+    integer(ID),
+    solucoes(ID, medico(ID, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O ID do medico deve ser um numero inteiro e este deve ser unico
+% Conhecimento perfeito negativo
++(-medico(ID, _, _, _, _)) :: (
+    integer(ID),
+    solucoes(ID, medico(ID, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O medico tem de estar associado a um centro de saude que existe
++medico(_, CS, _, _, _) :: (
+    solucoes(CS, centro_saude(CS, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O medico tem de estar associado a um centro de saude que existe
+% Conhecimento perfeito negativo
++(-medico(_, CS, _, _, _)) :: (
+    solucoes(CS, centro_saude(CS, _, _, _, _), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% Invariante que impede a insercao de conhecimento perfeito positivo relativo a um medico com 
+centro de saude interdito (conhecimento imperfeito interdito)
++medico(ID, IDCENTRO, NOME, EMAIL, ESP) :: (
+    solucoes((ID, IDCENTRO, NOME, EMAIL, ESP),
+              (medico(ID, IDCENTRO, NOME, EMAIL, ESP),
+               nulo(IDCENTRO)), S),
+    comprimento(S, N),
+    N == 0
+).
+
+\end{lstlisting}
+
+\subsubsection*{Consulta}
+De forma a que o registo de uma consulta seja válido, este deve estar associado a um utente, um 
+médico e a um centro de
+saúde que, de facto, existam na base de conhecimento. Por fim, não é admitida a inserção de 
+conhecimento repetido.
+
+\
+
+\begin{lstlisting}[caption={Invariantes de inserção relativos ao predicado \texttt{consulta}}]
+% Nao permite a insercao de registos duplicados
++consulta(IDM, IDU, IDC, DATA) :: (
+    solucoes((IDM, IDU, IDC, DATA), consulta(IDM, IDU, IDC, DATA), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% Nao permite a insercao de registos duplicados
+% Conhecimento perfeito negativo
++(-consulta(IDM, IDU, IDC, DATA)) :: (
+    solucoes((IDM, IDU, IDC, DATA), consulta(IDM, IDU, IDC, DATA), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O registo de uma consulta tem de estar associado a um medico, utente e centro de saude que existam
++consulta(IDM, IDU, CS, _) :: (
+    solucoes((IDM, IDU, CS), (medico(IDM, CS, _, _, _),
+                              utente(IDU, _, _, _, _, _, _, _, _, CS),
+                              centro_saude(CS, _, _, _, _)) , S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O registo de uma consulta tem de estar associado a um medico, utente e centro de saude que existam
+% Conhecimento perfeito negativo
++(-consulta(IDM, IDU, CS, _)) :: (
+    solucoes((IDM, IDU, CS), (medico(IDM, CS, _, _, _),
+                              utente(IDU, _, _, _, _, _, _, _, _, CS),
+                              centro_saude(CS, _, _, _, _)) , S),
+    comprimento(S, N),
+    N == 1
+).
+`\pagebreak`
+% Invariante que impede a insercao de conhecimento perfeito positivo relativo a uma consulta com 
+utente interdito (conhecimento imperfeito interdito)
++consulta(IDM, IDU, IDC, DATA) :: (
+    solucoes((IDM, IDU, IDC, DATA),
+             (consulta(IDM, IDU, IDC, DATA), nulo(IDU)), S),
+    comprimento(S, N),
+    N == 0
+).
+\end{lstlisting}
+
+\subsubsection*{Tratamento}
+De forma análoga, o registo de um tratamento deve estar associado a um utente, um elemento do 
+\textit{staff} e a um centro
+de saúde que existam efetivamente na base de conhecimento. Neste caso, também não é permitida a 
+inserção de
+conhecimento repetido.
+
+\
+
+\begin{lstlisting}[caption={Invariantes de inserção relativos ao predicado \texttt{tratamento}}]
+% Nao permite a insercao de registos duplicados
++tratamento(IDS, IDU, IDC, DATA, DESCR) :: (
+    solucoes((IDS, IDU, IDC, DATA, DESCR),
+             tratamento(IDS, IDU, IDC, DATA, DESCR), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% Nao permite a insercao de registos duplicados
+% Conhecimento perfeito negativo
++(-tratamento(IDS, IDU, IDC, DATA, DESCR)) :: (
+    solucoes((IDS, IDU, IDC, DATA, DESCR),
+             tratamento(IDS, IDU, IDC, DATA, DESCR), S),
+    comprimento(S, N),
+    N == 1
+).
+
+% O registo de um tratamento tem de estar associado a um elemento do staff, utente e centro de 
+saude que existam
++tratamento(IDS, IDU, CS, _, _) :: (
+    solucoes((IDS, IDU, CS), (staff(IDS, CS, _, _),
+                              utente(IDU, _, _, _, _, _, _, _, _, CS),
+                              centro_saude(CS, _, _, _, _)) , S),
+    comprimento(S, N),
+    N == 1
+).
+`\pagebreak`
+% O registo de um tratamento tem de estar associado a um elemento do staff, utente e centro de 
+saude que existam
+% Conhecimento perfeito negativo
++(-tratamento(IDS, IDU, CS, _, _)) :: (
+    solucoes((IDS, IDU, CS), (staff(IDS, CS, _, _),
+                              utente(IDU, _, _, _, _, _, _, _, _, CS),
+                              centro_saude(CS, _, _, _, _)) , S),
+    comprimento(S, N),
+    N == 1
+).
+
+% Invariante que impede a insercao de conhecimento perfeito positivo relativo a um tratamento com 
+centro de saude interdito (conhecimento imperfeito interdito)
++tratamento(IDS, IDU, IDC, DATA, DSCR) :: (
+    solucoes((IDS, IDU, IDC, DATA, DSCR),
+             (tratamento(IDS, IDU, IDC, DATA, DSCR), nulo(IDC)), S),
+    comprimento(S, N),
+    N == 0
+).
+
+\end{lstlisting}
+
+\subsubsection{Invariantes Associados à Remoção de Conhecimento}
+Para a remoção de conhecimento, foi oportuno desenvolver invariantes que, perante toda a lógica 
+do funcionamento do sistema,
+não permitissem a remoção de conhecimento relativo a utentes, elementos do \textit{staff}, 
+centros de saúde e médicos
+quando estes se encontrassem associados a um determinado registo de vacinação, consulta ou 
+tratamento. Por outro lado, a
+remoção destes mesmos registos não é permitida.
+
+\subsubsection*{Utente}
+Apenas é possível a remoção de um utente se não existirem registos de vacinação, consulta ou 
+tratamento, restrição essa
+imposta pelos seguintes invariantes.
+
+\
+
+\begin{lstlisting}[caption={Invariantes de remoção relativos ao predicado \texttt{utente}}]
+% Nao permite a remocao de um utente se existirem registos de vacinacao a si associados
+-utente(ID, _, _, _, _, _, _, _, _, _) :: (
+    solucoes(ID, vacinacao_Covid(_, ID, _, _, _), S),
+    comprimento(S, N),
+    N == 0
+).
+
+% Nao permite a remocao de um utente se existirem registos de consultas a si associaos
+-utente(ID, _, _, _, _, _, _, _, _, _) :: (
+    solucoes(ID, consulta(_, ID, _, _), S),
+    comprimento(S, N),
+    N == 0
+).
+
+% Nao permite a remocao de um utente se existirem
+-utente(ID, _, _, _, _, _, _, _, _, _) :: (
+    solucoes(ID, tratamento(_, ID, _, _, _), S),
+    comprimento(S, N),
+    N == 0
+).
+\end{lstlisting}
+
+\subsubsection*{\textit{Staff}}
+Foram construídos os seguintes invariantes no sentido de não permitir a remoção de um elemento 
+do \textit{staff}
+caso existam registos de vacinação ou de tratamento a si associados.
+
+\
+
+\begin{lstlisting}[caption={Invariantes de remoção relativos ao predicado \texttt{staff}}]
+% Nao permite a remocao de um elemento do staff se existirem registos de vacinacao a si associaos
+-staff(ID, _, _, _) :: (
+    solucoes(ID, vacinacao_Covid(ID, _, _, _, _), S),
+    comprimento(S, N),
+    N == 0
+).
+
+% Nao permite a remocao de um elemento do staff se existirem registos de tratamentos a si associaos
+-staff(ID, _, _, _) :: (
+    solucoes(ID, tratamento(ID, _, _, _, _), S),
+    comprimento(S, N),
+    N == 0
+).
+\end{lstlisting}
+
+\subsubsection*{Centro de Saúde}
+Para ser possível a remoção de um centro de saúde, é necessário que não existam utentes, 
+médicos ou elementos do \textit{staff}
+a si associados, restrição essa que é imposta pelos seguintes invariantes.
+
+\
+
+\begin{lstlisting}[caption={Invariantes de remoção relativos ao predicado \texttt{centro\_saude}}]
+% Nao permite a remocao de um centro de saude se existirem utentes a si associaos
+-centro_saude(CS, _, _, _, _) :: (
+    solucoes(CS, utente(_, _, _, _, _, _, _, _, _, CS), S),
+    comprimento(S, N),
+    N == 0
+).
+`\pagebreak`
+% Nao permite a remocao de um centro de saude se existirem elementos do staff a si associaos
+-centro_saude(CS, _, _, _, _) :: (
+    solucoes(CS, staff(_, CS, _, _), S),
+    comprimento(S, N),
+    N == 0
+).
+
+% Nao permite a remocao de um centro de saude se existirem medicos a si associaos
+-centro_saude(CS, _, _, _, _) :: (
+    solucoes(CS, medico(_, CS, _, _, _), S),
+    comprimento(S, N),
+    N == 0
+).
+\end{lstlisting}
+
+\subsubsection*{Vacinação}
+O seguinte invariante garante que não é possível remover registos de vacinação.
+
+\begin{lstlisting}[caption={Invariante de remoção relativos ao predicado 
+\texttt{vacinacao\_covid}}]
+% Nao permite a remocao de registos de atos de vacinacao
+-vacinacao_Covid(_, _, _, _, _) :: fail.
+\end{lstlisting}
+
+\subsubsection*{Médico}
+Para ser possível a remoção de um médico, é necessário que não existam registos de consultas 
+a si associados, restrição
+essa que é imposta pelo seguinte invariante.
+
+\
+
+\begin{lstlisting}[caption={Invariante de remoção relativo ao predicado \texttt{medico}}]
+% Nao permite a remocao de um medico se existirem consultas a si associadas
+-medico(ID, _, _, _, _) :: (solucoes(ID, consulta(ID, _, _, _), S),
+                            comprimento(S, N),
+                            N == 0).
+\end{lstlisting}
+
+\subsubsection*{Consulta}
+O seguinte invariante garante que não é possível remover registos de consultas.
+\
+\begin{lstlisting}[caption={Invariante de remoção relativo ao predicado \texttt{consulta}}]
+% Nao permite a remocao de registos de consultas
+-consulta(_, _, _, _) :: fail.
+\end{lstlisting}
+\subsubsection*{Tratamento}
+O seguinte invariante garante que não é possível remover registos de tratamentos.
+\
+\begin{lstlisting}[caption={Invariante de remoção relativo ao predicado \texttt{tratamento}}]
+% Nao permite a remocao de registos de tratamentos
+-tratamento(_, _, _, _, _) :: fail.
+\end{lstlisting}

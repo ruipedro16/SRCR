@@ -1,0 +1,97 @@
+\subsection{Problemática da Evolução do Conhecimento}
+
+O tratamento da problemática da evolução do conhecimento prende-se com o facto de manter a base 
+de conhecimento coesa e inviolável em termos
+de existência de conhecimento repetido, tendo em conta cada inserção ou remoção que possa 
+acontecer.
+
+Para que fosse possível a inserção e remoção de conhecimento na base de conhecimento, foram 
+desenvolvidos os predicados evolução e involução. Estes predicados obrigam a que a inserção 
+ou remoção cumpra certas regras definidas pelos invariantes.
+
+Assim, é necessário implementar uma série de medidas que não permita:
+
+\begin{itemize}
+    \item Remover informação que seja dependente de outra;
+    \item Inserção de informação repetida.
+\end{itemize}
+
+De modo a garantir esta segurança, não pode ser apagada informação
+dependente de outra, ou seja, não pode ser removida a informação sobre
+um utente se este possuir registos de vacinação a si associados. Além disso, não pode
+ser adicionada informação repetida, uma vez que não traz adição de conhecimento.
+Assim, no momento de alteração de informação, é necessário testar se esta
+corrompe a base de conhecimento. Estes testes são efetuados através do uso
+de invariantes, previamente explicados
+
+\subsection{Evolução de Conhecimento}
+
+\subsubsection{Conhecimento Perfeito Positivo}
+
+Numa primeira fase, e de maneira a todo o conhecimento positivo ser evoluído, ou
+seja, ser adicionado à base de conhecimento, foi criado o seguinte predicado \texttt{evolucao}. 
+Para ser possível adicionar conhecimento, este predicado verifica primeiro
+se o elemento a ser adicionado respeita todos os invariantes e, caso seja verdade
+então este é adicionado à base de conhecimento.
+
+\
+
+\begin{lstlisting}[caption={Evolução de Conhecimento Perfeito Positivo}]
+% Extensao do meta-predicado evolucao: T -> {V, F}
+% Conhecimento perfeito positivo
+evolucao(T) :- solucoes(I, +T::I, L),
+               insercao(T),
+               teste(L).
+\end{lstlisting}
+
+\subsubsection{Conhecimento Perfeito Negativo}
+
+De maneira a ser exequível a adição de conhecimento perfeito negativo na
+base de conhecimento, o predicado criado é em tudo semelhante ao interior, mas neste caso
+é necessário especificar que o conhecimento a adicionar é negativo. Neste caso,
+os invariantes a respeitar são os que dizem respeito à inserção de conhecimento
+negativo.
+
+\pagebreak
+
+\begin{lstlisting}[caption={Evolução de Conhecimento Perfeito Negativo}]
+% Extensao do meta-predicado evolucao: T -> {V, F}
+% Conhecimento perfeito negativo
+evolucao(-T) :- solucoes(I, +(-T)::I, L),
+                insercao(-T),
+                teste(L).
+\end{lstlisting}
+
+\subsection{Involução de Conhecimento}
+
+\subsubsection{Conhecimento Perfeito Positivo}
+
+Foi criado o predicado \texttt{involucao} análogo ao das aulas práticas de forma a permitir a 
+remoção de conhecimento da base de conhecimento, verificando todos os invariantes necessários. 
+Assim, só em caso de sucesso é que o conhecimento é, de facto, removido.
+
+\
+
+\begin{lstlisting}[caption={Involução de Conhecimento Perfeito Positivo}]
+% Extensao do meta-predicado involucao: T -> {V, F}
+% Conhecimento perfeito positivo
+involucao(T) :- solucoes(I, -T::I, L),
+                teste(L),
+                remocao(T).
+\end{lstlisting}
+
+\subsubsection{Conhecimento Perfeito Negativo}
+
+De forma análoga, para permitir também a involução do conhecimento negativo, foi
+criado outro predicado \texttt{involucao} mas com a particularidade de ser necessário especificar 
+que se trata de conhecimento negativo.
+
+\ 
+
+\begin{lstlisting}[caption={Involução de Conhecimento Perfeito Negativo}]
+% Extensao do meta-predicado involucao: T -> {V, F}
+% Conhecimento perfeito negativo
+involucao(-T) :- solucoes(I, -(-T)::I, L),
+                 teste(L),
+                 remocao(-T).
+\end{lstlisting}
